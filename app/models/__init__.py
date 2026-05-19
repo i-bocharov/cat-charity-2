@@ -1,3 +1,7 @@
-from .base import InvestmentTarget  # noqa
-from .charity_project import CharityProject  # noqa
-from .donation import Donation  # noqa
+from .charity_project import CharityProject
+from .donation import Donation
+
+__all__ = [
+    'CharityProject',
+    'Donation',
+]
