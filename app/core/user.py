@@ -6,9 +6,12 @@ from fastapi_users.authentication import (
     AuthenticationBackend, BearerTransport, JWTStrategy
 )
 from fastapi_users.db import SQLAlchemyUserDatabase
-from fastapi_users.managers import (  # type: ignore[import-not-found]
-    BaseUserManager
-)
+try:
+    from fastapi_users.managers import (  # type: ignore[import-not-found]
+        BaseUserManager
+    )
+except ModuleNotFoundError:
+    from fastapi_users import BaseUserManager
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
