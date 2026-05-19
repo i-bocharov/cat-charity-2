@@ -131,6 +131,10 @@ dmypy.json
 # .idea
 .idea
 
-test.db
 .vscode/
-fast_api.db
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+*.sqlite3-journal
