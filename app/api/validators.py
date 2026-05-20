@@ -65,11 +65,11 @@ async def check_project_not_closed(project: CharityProject) -> None:
 async def check_project_no_investments(project: CharityProject) -> None:
     """
     Запретить удаление проекта, в который уже внесены средства.
-    Вызывает HTTP 422, если invested_amount > 0.
+    Вызывает HTTP 400, если invested_amount > 0.
     """
     if project.invested_amount > 0:
         raise HTTPException(
-            status_code=422,
+            status_code=400,
             detail=(
                 'В проект уже внесены средства, удаление невозможно!'
             ),
