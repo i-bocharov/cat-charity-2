@@ -21,7 +21,7 @@ async def check_project_name_duplicate(
     )
     if project_id is not None:
         raise HTTPException(
-            status_code=422,
+            status_code=400,
             detail='Проект с таким именем уже существует!',
         )
 
