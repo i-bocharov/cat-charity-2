@@ -14,7 +14,7 @@ async def check_project_name_duplicate(
 ) -> None:
     """
     Проверить уникальность имени благотворительного проекта.
-    Вызывает HTTP 422, если проект с таким именем уже существует в БД.
+    Вызывает HTTP 400, если проект с таким именем уже существует в БД.
     """
     project_id = await charity_project_crud.get_project_id_by_name(
         project_name, session
@@ -51,11 +51,11 @@ async def check_project_exists(
 async def check_project_not_closed(project: CharityProject) -> None:
     """
     Запретить обновление или удаление полностью инвестированного проекта.
-    Вызывает HTTP 422, если флаг fully_invested установлен в True.
+    Вызывает HTTP 400, если флаг fully_invested установлен в True.
     """
     if project.fully_invested:
         raise HTTPException(
-            status_code=422,
+            status_code=400,
             detail=(
                 'Нельзя обновить или удалить полностью инвестированный проект!'
             ),
