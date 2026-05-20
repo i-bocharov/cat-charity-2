@@ -13,7 +13,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.db import get_async_session
+from app.api.validators import validate_password_strength
 from app.models.user import User
+from app.schemas.user import UserCreate
 
 
 SessionDep = Annotated[AsyncSession, Depends(get_async_session)]
@@ -23,6 +25,15 @@ class UserManager(BaseUserManager[User, int]):
     user_db_model = User
     reset_password_token_secret = settings.secret_key
     verification_token_secret = settings.secret_key
+
+    async def validate_password(  # type: ignore[override]
+        self,
+        password: str,
+        user: UserCreate | User,
+    ) -> None:
+        # Выносим бизнес-логику в отдельную функцию
+        validate_password_strength(password)
+        await super().validate_password(password, user)
 
 
 async def get_user_db(session: SessionDep):

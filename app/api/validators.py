@@ -1,6 +1,7 @@
 from typing import cast
 
 from fastapi import HTTPException
+from fastapi_users.exceptions import InvalidPasswordException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.charity_project import charity_project_crud
@@ -89,4 +90,19 @@ async def check_full_amount_ge_invested(
                 'Значение full_amount не может быть '
                 'меньше уже вложенной суммы!'
             ),
+        )
+
+
+MIN_PASSWORD_LENGTH = 3
+
+
+def validate_password_strength(password: str) -> None:
+    """
+    Проверяет сложность пароля.
+    """
+    if len(password) < MIN_PASSWORD_LENGTH:
+        raise InvalidPasswordException(
+            reason=(
+                f"Password should be at least {MIN_PASSWORD_LENGTH} characters"
+            )
         )
