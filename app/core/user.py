@@ -1,17 +1,14 @@
 from typing import Annotated
 
 from fastapi import Depends
-from fastapi_users import FastAPIUsers
+from fastapi_users import FastAPIUsers, BaseUserManager
 from fastapi_users.authentication import (
     AuthenticationBackend, BearerTransport, JWTStrategy
 )
-from fastapi_users.db import SQLAlchemyUserDatabase
 try:
-    from fastapi_users.managers import (  # type: ignore[import-not-found]
-        BaseUserManager
-    )
-except ModuleNotFoundError:
-    from fastapi_users import BaseUserManager
+    from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
+except ImportError:
+    from fastapi_users.db import SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings

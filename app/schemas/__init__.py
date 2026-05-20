@@ -4,7 +4,7 @@ from .charity_project import (
     CharityProjectUpdate,
 )
 from .donation import DonationCreate, DonationDB, DonationFullInfoDB
-from .user import UserCreate
+from .user import UserRead, UserCreate, UserUpdate
 
 __all__ = [
     'CharityProjectCreate',
@@ -13,5 +13,7 @@ __all__ = [
     'DonationCreate',
     'DonationDB',
     'DonationFullInfoDB',
-    'UserCreate'
+    'UserRead',
+    'UserCreate',
+    'UserUpdate',
 ]
