@@ -15,6 +15,7 @@ from app.core.user import current_superuser, current_user
 from app.crud.charity_project import charity_project_crud
 from app.schemas.charity_project import (
     CharityProjectCreate,
+    CharityProjectDB,
     CharityProjectUpdate,
 )
 
@@ -24,58 +25,58 @@ SessionDep = Annotated[AsyncSession, Depends(get_async_session)]
 
 @router.get(
     '/',
-    response_model=list[CharityProjectUpdate],
+    response_model=list[CharityProjectDB],
     response_model_exclude_none=True,
     dependencies=[Depends(current_user)],
 )
 async def get_all_projects(
     session: SessionDep,
-) -> list[CharityProjectUpdate]:
+) -> list[CharityProjectDB]:
     """
     Получить список всех благотворительных проектов.
     """
     projects = await charity_project_crud.get_multi(session)
-    return cast(list[CharityProjectUpdate], projects)
+    return cast(list[CharityProjectDB], projects)
 
 
 @router.get(
     '/{project_id}',
-    response_model=CharityProjectUpdate,
+    response_model=CharityProjectDB,
     response_model_exclude_none=True,
     dependencies=[Depends(current_user)],
 )
 async def get_project(
     project_id: int,
     session: SessionDep,
-) -> CharityProjectUpdate:
+) -> CharityProjectDB:
     """
     Получить конкретный проект по его ID.
     """
     project = await check_project_exists(project_id, session)
-    return cast(CharityProjectUpdate, project)
+    return cast(CharityProjectDB, project)
 
 
 @router.post(
     '/',
-    response_model=CharityProjectUpdate,
+    response_model=CharityProjectDB,
     response_model_exclude_none=True,
     dependencies=[Depends(current_superuser)],
 )
 async def create_project(
     project_in: CharityProjectCreate,
     session: SessionDep,
-) -> CharityProjectUpdate:
+) -> CharityProjectDB:
     """
     Создать новый благотворительный проект (только для суперпользователей).
     """
     await check_project_name_duplicate(project_in.name, session)
     project = await charity_project_crud.create(session, project_in)
-    return cast(CharityProjectUpdate, project)
+    return cast(CharityProjectDB, project)
 
 
 @router.patch(
     '/{project_id}',
-    response_model=CharityProjectUpdate,
+    response_model=CharityProjectDB,
     response_model_exclude_none=True,
     dependencies=[Depends(current_superuser)],
 )
@@ -83,7 +84,7 @@ async def update_project(
     project_id: int,
     project_in: CharityProjectUpdate,
     session: SessionDep,
-) -> CharityProjectUpdate:
+) -> CharityProjectDB:
     """
     Обновить поля проекта (только для суперпользователей).
     """
@@ -98,19 +99,19 @@ async def update_project(
         await check_project_name_duplicate(project_in.name, session)
 
     updated = await charity_project_crud.update(session, project, project_in)
-    return cast(CharityProjectUpdate, updated)
+    return cast(CharityProjectDB, updated)
 
 
 @router.delete(
     '/{project_id}',
-    response_model=CharityProjectUpdate,
+    response_model=CharityProjectDB,
     response_model_exclude_none=True,
     dependencies=[Depends(current_superuser)],
 )
 async def delete_project(
     project_id: int,
     session: SessionDep,
-) -> CharityProjectUpdate:
+) -> CharityProjectDB:
     """
     Удалить проект (только для суперпользователей).
     """
@@ -118,4 +119,4 @@ async def delete_project(
     await check_project_not_closed(project)
     await check_project_no_investments(project)
     deleted = await charity_project_crud.remove(session, project)
-    return cast(CharityProjectUpdate, deleted)
+    return cast(CharityProjectDB, deleted)
