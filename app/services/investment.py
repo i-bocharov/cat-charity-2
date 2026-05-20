@@ -1,5 +1,7 @@
 from typing import cast
 
+from datetime import datetime, timezone
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.charity_project import charity_project_crud
@@ -50,6 +52,7 @@ async def invest_in_projects(
 
         if project.invested_amount == project.full_amount:
             project.fully_invested = True
+            project.close_date = datetime.now(timezone.utc)
             project_idx += 1
 
     return updated_objects

@@ -21,6 +21,7 @@ from app.schemas.charity_project import (
     CharityProjectDB,
     CharityProjectUpdate,
 )
+from app.services.investment import invest_in_projects
 
 router = APIRouter()
 SessionDep = Annotated[AsyncSession, Depends(get_async_session)]
@@ -74,6 +75,13 @@ async def create_project(
     """
     await check_project_name_duplicate(project_in.name, session)
     project = await charity_project_crud.create(session, project_in)
+
+    # Запускаем распределение инвестиций
+    await invest_in_projects(session)
+
+    await session.commit()
+    await session.refresh(project)
+
     return cast(CharityProjectDB, project)
 
 
