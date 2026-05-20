@@ -20,19 +20,23 @@ SessionDep = Annotated[AsyncSession, Depends(get_async_session)]
     '/',
     response_model=DonationDB,
     response_model_exclude_none=True,
-    dependencies=[Depends(current_user)],
 )
 async def create_donation(
     donation_in: DonationCreate,
     session: SessionDep,
+    user: User = Depends(current_user),
 ) -> DonationDB:
     """
     Создать новое пожертвование и запустить авто-инвестирование.
     """
-    donation = await donation_crud.create(session, donation_in)
+    donation = await donation_crud.create(
+        session, donation_in, user_id=user.id
+    )
+
     await invest_in_projects(session)
     await session.commit()
     await session.refresh(donation)
+
     return cast(DonationDB, donation)
 
 

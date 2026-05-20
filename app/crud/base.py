@@ -33,11 +33,17 @@ class CRUDBase:
         result = await session.execute(select(self.model))
         return list(result.scalars().all())
 
-    async def create(self, session: AsyncSession, obj_in: BaseModel) -> Base:
+    async def create(
+        self,
+        session: AsyncSession,
+        obj_in: BaseModel,
+        **extra_attrs,
+    ) -> Base:
         """
         Создать новый объект в базе данных из Pydantic-схемы.
         """
         obj_dict = obj_in.model_dump()
+        obj_dict.update(extra_attrs)
         db_obj = self.model(**obj_dict)
         session.add(db_obj)
         await session.commit()
