@@ -11,6 +11,8 @@ class CharityProjectBase(BaseModel):
 
 class CharityProjectCreate(CharityProjectBase):
     """Схема создания проекта."""
+    model_config = ConfigDict(extra='forbid')
+
     full_amount: int = Field(..., gt=0)
 
 
