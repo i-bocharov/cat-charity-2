@@ -1,5 +1,7 @@
 from typing import Annotated, cast
 
+from datetime import datetime, timezone
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,6 +14,7 @@ from app.api.validators import (
 )
 from app.core.db import get_async_session
 from app.core.user import current_superuser, current_user
+from app.models import CharityProject
 from app.crud.charity_project import charity_project_crud
 from app.schemas.charity_project import (
     CharityProjectCreate,
@@ -99,7 +102,19 @@ async def update_project(
         await check_project_name_duplicate(project_in.name, session)
 
     updated = await charity_project_crud.update(session, project, project_in)
-    return cast(CharityProjectDB, updated)
+    updated_project = cast(CharityProject, updated)
+
+    # Автоматическое закрытие проекта, если собранная сумма >= целевой
+    if (
+        updated_project.invested_amount >= updated_project.full_amount
+        and not updated_project.fully_invested
+    ):
+        updated_project.fully_invested = True
+        updated_project.close_date = datetime.now(timezone.utc)
+        await session.commit()
+        await session.refresh(updated_project)
+
+    return cast(CharityProjectDB, updated_project)
 
 
 @router.delete(
