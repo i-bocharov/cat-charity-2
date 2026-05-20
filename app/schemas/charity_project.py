@@ -18,6 +18,8 @@ class CharityProjectCreate(CharityProjectBase):
 
 class CharityProjectUpdate(BaseModel):
     """Схема обновления проекта."""
+    model_config = ConfigDict(extra='forbid')
+
     name: str | None = Field(None, min_length=5, max_length=100)
     description: str | None = Field(None, min_length=10)
     full_amount: int | None = Field(None, gt=0)
