@@ -46,8 +46,6 @@ class CRUDBase:
         obj_dict.update(extra_attrs)
         db_obj = self.model(**obj_dict)
         session.add(db_obj)
-        await session.commit()
-        await session.refresh(db_obj)
         return db_obj
 
     async def update(
@@ -59,8 +57,6 @@ class CRUDBase:
         update_data = obj_in.model_dump(exclude_unset=True)
         for field, value in update_data.items():
             setattr(db_obj, field, value)
-        await session.commit()
-        await session.refresh(db_obj)
         return db_obj
 
     async def remove(self, session: AsyncSession, db_obj: Base) -> Base:
@@ -68,5 +64,4 @@ class CRUDBase:
         Удалить объект из базы данных.
         """
         await session.delete(db_obj)
-        await session.commit()
         return db_obj

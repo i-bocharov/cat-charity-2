@@ -1,9 +1,10 @@
 from sqlalchemy import select
+from fastapi_users.db import SQLAlchemyUserDatabase
 
 from app.core.db import AsyncSessionLocal
 from app.core.user import UserManager
 from app.models.user import User
-from fastapi_users.db import SQLAlchemyUserDatabase
+from app.schemas import UserCreate
 
 
 async def create_user(
@@ -27,17 +28,15 @@ async def create_user(
         )
         user_manager = UserManager(user_db)
 
-        user_create = user_manager.parse_user_create({
-            "email": email.lower(),
-            "password": password,
-            "is_active": True,
-            "is_verified": False,
-            "is_superuser": is_superuser,
-        })
+        user_create = UserCreate(email=email.lower(), password=password)
 
         created_user: User = await user_manager.create(
             user_create, safe=False, request=None
         )
+
+        if is_superuser:
+            created_user.is_superuser = True
+
         await session.commit()
         await session.refresh(created_user)
 

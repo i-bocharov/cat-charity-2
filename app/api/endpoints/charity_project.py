@@ -76,6 +76,9 @@ async def create_project(
     await check_project_name_duplicate(project_in.name, session)
     project = await charity_project_crud.create(session, project_in)
 
+    # Делает pending-объект видимым для SELECT внутри invest_in_projects
+    # без завершения транзакции.
+    await session.flush()
     # Запускаем распределение инвестиций
     await invest_in_projects(session)
 
@@ -119,8 +122,9 @@ async def update_project(
     ):
         updated_project.fully_invested = True
         updated_project.close_date = datetime.now(timezone.utc)
-        await session.commit()
-        await session.refresh(updated_project)
+
+    await session.commit()
+    await session.refresh(updated_project)
 
     return cast(CharityProjectDB, updated_project)
 
@@ -141,5 +145,9 @@ async def delete_project(
     project = await check_project_exists(project_id, session)
     await check_project_not_closed(project)
     await check_project_no_investments(project)
+
     deleted = await charity_project_crud.remove(session, project)
+
+    await session.commit()
+
     return cast(CharityProjectDB, deleted)
