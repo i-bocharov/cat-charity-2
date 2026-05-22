@@ -33,7 +33,10 @@ async def create_donation(
         session, donation_in, user_id=user.id
     )
 
+    await session.flush()
+
     await invest_in_projects(session)
+
     await session.commit()
     await session.refresh(donation)
 
