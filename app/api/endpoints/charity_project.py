@@ -31,7 +31,6 @@ SessionDep = Annotated[AsyncSession, Depends(get_async_session)]
     '/',
     response_model=list[CharityProjectDB],
     response_model_exclude_none=True,
-    dependencies=[Depends(current_user)],
 )
 async def get_all_projects(
     session: SessionDep,
